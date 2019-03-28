@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import PostForm
 from .models import Post
@@ -14,6 +15,8 @@ def post_detail(request, pk):
     return render(request, 'blog/post_detail.html', {'post': post})
 
 def post_new(request):
+    if request.user.is_anonymous:
+        return HttpResponse('Unauthorized', status=401)
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
@@ -27,6 +30,8 @@ def post_new(request):
     return render(request, 'blog/post_edit.html', {'form': form})
 
 def post_edit(request, pk):
+    if request.user.is_anonymous:
+        return HttpResponse('Unauthorized', status=401)
     post = get_object_or_404(Post, pk=pk)
     if request.method == "POST":
         form = PostForm(request.POST, instance=post)
